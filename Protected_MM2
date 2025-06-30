@@ -1,50 +1,29 @@
 local screenGui = script.Parent
-local loadingText = screenGui:WaitForChild("LoadingText")
-local progressBar = screenGui:WaitForChild("ProgressBarBackground")
-local fillBar = progressBar:WaitForChild("ProgressBarFill")
+local spinner = screenGui:WaitForChild("Spinner")
+local textLabel = screenGui:WaitForChild("LoadingText")
 
--- Create and attach blur
+-- Create blur
 local blur = Instance.new("BlurEffect")
 blur.Size = 24
 blur.Parent = game:GetService("Lighting")
 
--- Loading phrases
-local loadingPhrases = {
-	"Loading map...",
-	"Preparing weapons...",
-	"Choosing murderer...",
-	"Sharpening knives...",
-	"Detective loading...",
-	"Teleporting players...",
-	"Spawning characters...",
-	"Calculating roles...",
-	"Finalizing setup...",
-	"Almost ready..."
-}
-
--- Loading duration
-local duration = 600 -- 10 minutes
-local startTime = tick()
-
--- Animate loading text
+-- Animate spinner
 task.spawn(function()
-	while tick() - startTime < duration do
-		for _, phrase in ipairs(loadingPhrases) do
-			if tick() - startTime >= duration then break end
-			loadingText.Text = phrase
-			wait(1.5)
-		end
+	while screenGui.Enabled do
+		spinner.Rotation += 5
+		wait(0.01)
 	end
 end)
 
--- Animate progress bar
-while tick() - startTime < duration do
-	local elapsed = tick() - startTime
-	local percent = math.clamp(elapsed / duration, 0, 1)
-	fillBar.Size = UDim2.new(percent, 0, 1, 0)
-	wait(0.1)
+-- Fade in the text
+for i = 1, 100 do
+	textLabel.TextTransparency = 1 - (i / 100)
+	wait(0.02)
 end
 
--- Hide GUI and cleanup
+-- Loading duration (10 minutes)
+wait(600)
+
+-- Cleanup
 screenGui.Enabled = false
 blur:Destroy()
