@@ -1,8 +1,14 @@
 local screenGui = script.Parent
 local loadingText = screenGui:WaitForChild("LoadingText")
-local progressBar = screenGui:WaitForChild("Frame")
-local fillBar = progressBar:WaitForChild("Frame")
+local progressBar = screenGui:WaitForChild("ProgressBarBackground")
+local fillBar = progressBar:WaitForChild("ProgressBarFill")
 
+-- Create and attach blur
+local blur = Instance.new("BlurEffect")
+blur.Size = 24
+blur.Parent = game:GetService("Lighting")
+
+-- Loading phrases
 local loadingPhrases = {
 	"Loading map...",
 	"Preparing weapons...",
@@ -16,25 +22,14 @@ local loadingPhrases = {
 	"Almost ready..."
 }
 
--- Set up blur
-local blur = game.Lighting:FindFirstChildOfClass("BlurEffect")
-if not blur then
-	blur = Instance.new("BlurEffect")
-	blur.Size = 24
-	blur.Parent = game.Lighting
-end
-
--- Show GUI
-screenGui.Enabled = true
-fillBar.Size = UDim2.new(0, 0, 1, 0)
-
+-- Loading duration
 local duration = 600 -- 10 minutes
 local startTime = tick()
 
--- Loading animation
+-- Animate loading text
 task.spawn(function()
 	while tick() - startTime < duration do
-		for _, phrase in pairs(loadingPhrases) do
+		for _, phrase in ipairs(loadingPhrases) do
 			if tick() - startTime >= duration then break end
 			loadingText.Text = phrase
 			wait(1.5)
@@ -42,7 +37,7 @@ task.spawn(function()
 	end
 end)
 
--- Progress bar animation
+-- Animate progress bar
 while tick() - startTime < duration do
 	local elapsed = tick() - startTime
 	local percent = math.clamp(elapsed / duration, 0, 1)
@@ -50,6 +45,6 @@ while tick() - startTime < duration do
 	wait(0.1)
 end
 
--- Hide loading screen and remove blur
+-- Hide GUI and cleanup
 screenGui.Enabled = false
 blur:Destroy()
